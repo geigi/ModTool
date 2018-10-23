@@ -84,6 +84,10 @@ namespace ModTool.Exporting.Editor
             {
                 return _outputDirectory;
             }
+            set
+            {
+                _outputDirectory = value;
+            }
         }
 
         [SerializeField]
