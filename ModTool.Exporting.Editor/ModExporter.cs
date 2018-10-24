@@ -18,6 +18,11 @@ namespace ModTool.Exporting.Editor
         public static event Action ExportStarting;
 
         /// <summary>
+        /// Occurs when the export process has finished.
+        /// </summary>
+        public static event Action ExportFinished;
+
+        /// <summary>
         /// Is this ModExporter currently exporting a Mod?
         /// </summary>
         public bool isExporting { get { return currentStep >= 0; } }
@@ -42,6 +47,8 @@ namespace ModTool.Exporting.Editor
         private ExportData data;
 
         private static bool didReloadScripts;
+
+        public bool ExitOnFinish = false;
         
         void OnEnable()
         {
@@ -51,6 +58,7 @@ namespace ModTool.Exporting.Editor
         void OnDisable()
         {
             ExportStarting = null;
+            ExportFinished = null;
             EditorApplication.update -= Update;
         }
 
@@ -152,6 +160,17 @@ namespace ModTool.Exporting.Editor
             Restore();
 
             EditorUtility.ClearProgressBar();
+
+            if (ExportFinished != null)
+            {
+                Debug.Log("Firing export finished event.");
+                ExportFinished();
+            }
+
+            if (ExitOnFinish)
+            {
+                EditorApplication.Exit(0);
+            }
         }
 
         private void Restore()
