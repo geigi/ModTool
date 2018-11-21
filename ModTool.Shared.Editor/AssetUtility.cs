@@ -82,8 +82,9 @@ namespace ModTool.Shared.Editor
         /// </summary>
         /// <param name="assetPaths">A list of asset paths</param>
         /// <param name="targetDirectory">The directory to move all assets to.</param>
-        public static void MoveAssets(List<string> assetPaths, string targetDirectory)
+        public static List<string> MoveAssets(List<string> assetPaths, string targetDirectory)
         {
+            var copiedAssets = new List<string>();
             for (int i = 0; i < assetPaths.Count; i++)
             {
                 string assetPath = assetPaths[i];
@@ -93,10 +94,23 @@ namespace ModTool.Shared.Editor
                     string assetName = Path.GetFileName(assetPath);
                     string newAssetPath = Path.Combine(targetDirectory, assetName);
 
-                    AssetDatabase.MoveAsset(assetPath, newAssetPath);
+                    if (assetPath.Contains("Library"))
+                    {
+                        copiedAssets.Add(Path.Combine(targetDirectory, assetName));
+                        assetPath = Path.Combine(Directory.GetCurrentDirectory(), assetPath);
+                        newAssetPath = Path.Combine(Path.Combine(Directory.GetCurrentDirectory(), targetDirectory), assetName);
+                        File.Copy(assetPath, newAssetPath, true);
+                        AssetDatabase.ImportAsset(Path.Combine(targetDirectory, assetName), ImportAssetOptions.ForceSynchronousImport);
+                    }
+                    else
+                    {
+                        AssetDatabase.MoveAsset(assetPath, newAssetPath);
+                    }
+                    
                     assetPaths[i] = newAssetPath;
                 }
             }
+            return copiedAssets;
         }
 
         /// <summary>

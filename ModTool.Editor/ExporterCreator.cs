@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Reflection;
 using System.IO;
 using UnityEngine;
@@ -39,6 +41,17 @@ namespace ModTool.Editor
         [UnityEditor.Callbacks.DidReloadScripts]
         public static void DisableExporter()
         {
+            if (!String.IsNullOrEmpty(EditorPrefs.GetString("copiedDLLs")))
+            {
+                foreach (var dll in EditorPrefs.GetString("copiedDLLs").Split(new[] {"####"}, StringSplitOptions.None))
+                {
+                    Debug.Log("Deleting: " + dll);
+                    AssetDatabase.DeleteAsset(dll);
+                }
+
+                EditorPrefs.SetString("copiedDLLs", "");
+            }
+            
             string modToolDirectory = AssetUtility.GetModToolDirectory();
             string exporterPath = Path.Combine(modToolDirectory, Path.Combine("Editor", "ModTool.Exporting.Editor.dll"));
             SetPluginEnabled(exporterPath, false);
@@ -64,6 +77,7 @@ namespace ModTool.Editor
                 Path.Combine(modToolDirectory, Path.Combine("Editor", "ModTool.Exporting.Editor.dll")),
                 Path.Combine(modToolDirectory, Path.Combine("Editor", "ModTool.Shared.Editor.dll")),
                 Path.Combine(modToolDirectory, "ModTool.Shared.dll"),
+                Path.Combine(modToolDirectory, "ModTool.dll"),
                 Path.Combine(modToolDirectory, "ModTool.Shared.xml"),
                 Path.Combine(modToolDirectory, "ModTool.Interface.dll"),
                 Path.Combine(modToolDirectory, "ModTool.Interface.xml"),
@@ -72,11 +86,17 @@ namespace ModTool.Editor
             };
 
             List<string> assemblyPaths = GetApiAssemblyPaths(CodeSettings.apiAssemblies);
-            AssetUtility.MoveAssets(assemblyPaths, modToolDirectory);
-            assetPaths.AddRange(assemblyPaths);
+            
+            var copied = AssetUtility.MoveAssets(assemblyPaths, modToolDirectory);
+            
+            EditorPrefs.SetString("copiedDLLs", String.Join("####", copied.ToArray()));
+            
+            assetPaths.AddRange(copied);
             
             SetPluginEnabled(exporterPath, true);
-
+            
+            AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+            
             //TODO: ExportPackageOptions.IncludeLibraryAssets makes the package huge in Unity 2017.2
             AssetDatabase.ExportPackage(assetPaths.ToArray(), fileName, exportPackageOptions | ExportPackageOptions.IncludeLibraryAssets);
         }
@@ -95,6 +115,10 @@ namespace ModTool.Editor
         private static List<string> GetApiAssemblyPaths(List<string> apiAssemblies)
         {
             List<string> assemblyPaths = AssemblyUtility.GetAssemblies(Application.dataPath, AssemblyFilter.ApiAssemblies);
+            var scriptPath = Path.Combine(Path.Combine(Directory.GetParent(Application.dataPath).FullName, "Library"),
+                "ScriptAssemblies");
+            Debug.Log(scriptPath);
+            assemblyPaths.AddRange(AssemblyUtility.GetAssemblies(scriptPath, AssemblyFilter.ApiAssemblies));
 
             for(int i = 0; i < assemblyPaths.Count; i++)            
                 assemblyPaths[i] = AssetUtility.GetRelativePath(assemblyPaths[i]);

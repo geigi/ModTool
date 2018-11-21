@@ -1,7 +1,10 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Mono.Cecil;
+using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace ModTool.Shared
 { 
@@ -43,8 +46,9 @@ namespace ModTool.Shared
                 {
                     assemblyDefinition = Mono.Cecil.AssemblyDefinition.ReadAssembly(assembly);
                 }
-                catch
+                catch (Exception e)
                 {
+                    Debug.Log(e);
                     continue;
                 }
 
