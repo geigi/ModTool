@@ -27,7 +27,7 @@ namespace ModTool.Editor
         /// <summary>
         /// Create a mod exporter package after building the game.
         /// </summary>
-        [UnityEditor.Callbacks.PostProcessBuild]
+        ///[UnityEditor.Callbacks.PostProcessBuild]
         public static void CreateExporterPostBuild(BuildTarget target, string pathToBuiltProject)
         {
             pathToBuiltProject = Path.GetDirectoryName(pathToBuiltProject);
