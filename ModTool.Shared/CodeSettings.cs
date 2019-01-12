@@ -65,6 +65,18 @@ namespace ModTool.Shared
                 return instance._apiAssemblies;
             }
         }
+        
+        /// <summary>
+        /// List of GUIDs that the apiAssemblies should receive.
+        /// Keep same order as in apiAssemblies. Empty fields or list will be ignored.
+        /// </summary>
+        public static List<string> assemblyGUIDs
+        {
+            get
+            {
+                return instance._assemblyGUIDs;
+            }
+        }
 
         [SerializeField]
         private List<InheritanceRestriction> _inheritanceRestrictions = new List<InheritanceRestriction>();
@@ -80,6 +92,9 @@ namespace ModTool.Shared
 
         [SerializeField]
         private List<string> _apiAssemblies = new List<string>();
+        
+        [SerializeField]
+        private List<string> _assemblyGUIDs = new List<string>();
         
         protected CodeSettings()
         {

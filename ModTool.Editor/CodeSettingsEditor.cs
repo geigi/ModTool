@@ -11,6 +11,7 @@ namespace ModTool.Editor
         private SerializedProperty typeRestrictions;
         private SerializedProperty namespaceRestrictions;
         private SerializedProperty apiAssemblies;
+        private SerializedProperty assemblyGUIDs;
 
         void OnEnable()
         {
@@ -19,6 +20,7 @@ namespace ModTool.Editor
             typeRestrictions = serializedObject.FindProperty("_typeRestrictions");
             namespaceRestrictions = serializedObject.FindProperty("_namespaceRestrictions");
             apiAssemblies = serializedObject.FindProperty("_apiAssemblies");
+            assemblyGUIDs = serializedObject.FindProperty("_assemblyGUIDs");
         }
 
         public override void OnInspectorGUI()
@@ -35,6 +37,7 @@ namespace ModTool.Editor
             EditorGUILayout.PropertyField(typeRestrictions, true);
             EditorGUILayout.PropertyField(namespaceRestrictions, true);
             EditorGUILayout.PropertyField(apiAssemblies, true);
+            EditorGUILayout.PropertyField(assemblyGUIDs, true);
 
             //EditorGUI.indentLevel--;
 

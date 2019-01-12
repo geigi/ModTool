@@ -51,7 +51,12 @@ namespace ModTool.Shared
                     Debug.Log(e);
                     continue;
                 }
+                
 
+                if (assemblyDefinition.Name.FullName.Contains("JetBrains"))
+                {
+                    continue;
+                }
 
                 if (assemblyDefinition.Name.FullName.Contains("ModTool"))
                 {

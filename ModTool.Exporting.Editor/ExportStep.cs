@@ -165,7 +165,10 @@ namespace ModTool.Exporting.Editor
             List<Asset> assets = new List<Asset>();
 
             foreach (string path in AssetUtility.GetAssets(filter))
-                assets.Add(new Asset(path));
+            {
+                if (!path.StartsWith("Packages"))
+                    assets.Add(new Asset(path));
+            }
             
             return assets;
         }

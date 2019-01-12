@@ -86,12 +86,15 @@ namespace ModTool.Editor
             };
 
             List<string> assemblyPaths = GetApiAssemblyPaths(CodeSettings.apiAssemblies);
-            
-            var copied = AssetUtility.MoveAssets(assemblyPaths, modToolDirectory);
+
+            List<string> includeButNotCopied;
+            var copied = AssetUtility.MoveAssets(assemblyPaths, modToolDirectory, out includeButNotCopied);
+            AssetUtility.ChangeGUIDs(copied, CodeSettings.assemblyGUIDs);
             
             EditorPrefs.SetString("copiedDLLs", String.Join("####", copied.ToArray()));
             
             assetPaths.AddRange(copied);
+            assetPaths.AddRange(includeButNotCopied);
             
             SetPluginEnabled(exporterPath, true);
             
@@ -100,7 +103,7 @@ namespace ModTool.Editor
             //TODO: ExportPackageOptions.IncludeLibraryAssets makes the package huge in Unity 2017.2
             AssetDatabase.ExportPackage(assetPaths.ToArray(), fileName, exportPackageOptions | ExportPackageOptions.IncludeLibraryAssets);
         }
-
+        
         private static void SetPluginEnabled(string pluginPath, bool enabled)
         {
             PluginImporter pluginImporter = AssetImporter.GetAtPath(pluginPath) as PluginImporter;
